@@ -59,22 +59,60 @@ import time
 
 
 
-# TODO ce qui est en commentaire
+# Retire les doublons d'une liste
+def keepUnique(mylist):
+    return set(mylist)
+
+treeLinksList = []
+
+
+# Construit la liste des liens telechargeable
 def constructTreeLink(baseLink,depth):
-    if depth == 0:
+    global treeLinksList
+    if depth <= 0:
+        return
+    if len(treeLinksList) > 200:
+        print "Too much links in list -> stoping crawling"
         return
     # fetch all the links on the page
-    # add all to list
-    # Foreach link -> Call function with depth -1
-    for link in links:
-        constructTreeLink(link,depth-1)
+    soup = BeautifulSoup(urllib2.urlopen(baseLink),"html.parser")
+    links = soup.findAll("a")
+    for link in links[5:]:
+        cleanString = link.get('href','/').replace("%20"," ")
+        downloadLink = urlparse.urljoin(baseLink,cleanString)        
+        tmp = downloadLink[len(downloadLink)-3:]
+        if not (tmp == "pdf" or tmp == "odp" or tmp == "txt"):
+            constructTreeLink(downloadLink,depth-1)
+        else :
+            #print downloadLink
+            # Test a faire
+            treeLinksList.append(str(downloadLink))
+    return treeLinksList
 
+# Telecharge tout ce qui match l'extension "extension dans la liste des fichiers
+#
+def download_All_Update(links,folder,extension):
+    links = set(links)
+    pattern_filename = re.compile('[^/,]+\.'+extension+'$')
+    print "Downloading files to folder : "+folder
+    for link in links:
+        #print link
+        name = pattern_filename.search(link)
+        if name:
+            print name.group(0)
+            r = requests.get(link, stream=True)
+            with open(folder+"/"+name.group(0),"wb") as f:
+                for chunk in r:
+                    f.write(chunk)
+                    f.flush()
+            
+# Old version
 def download_one_link(link,baseurl,folder,extension):
     patternFolder = re.compile('.+\.'+extension+'$')
     pattern_filename = re.compile('[^/,]+\.'+extension+'$')
-    cleanString = link['href'].replace("%20"," ")
+    cleanString = link.get('href','/').replace("%20"," ")
     if(patternFolder.match(cleanString)):
-        downloadLink =urlparse.urljoin(baseurl,cleanString)
+        downloadLink = urlparse.urljoin(baseurl,cleanString)
         print downloadLink
         name = pattern_filename.search(downloadLink)
         print name.group(0)
@@ -107,7 +145,7 @@ def download_all_in_url(baseurl,folder,extension):
         # For each link , clean the string and then download the content        
         download_one_link(link, baseurl,folder,extension)
 
-# TODO -> Devrait fonctionner
+
 def download_all_in_multipleUrl(baseurl,folder,extension,depth):
     constructTreeLink(baseurl,depth)
     for link in links:
@@ -120,11 +158,18 @@ if __name__ == '__main__':
         baseurl = raw_input("Enter the URL : ")
     directory = ""
     while directory == "":
-        directory = raw_input("Where would you want to save the files ? :")
+        directory = raw_input("Where would you want to save the files ? : ")
     extension = ""
     while extension == "":
-        extension = raw_input("Which type of files do you want ?( extensions , like pdf ,txt...whatever)")
-    download_all_in_url(baseurl,directory,extension)
+        extension = raw_input("Which type of files do you want ?( extensions , like pdf ,txt...whatever) : ")
+    depth = -1
+    while (depth < 0 or not depth.isdigit()):
+        depth = raw_input("Enter the depth you want to crawl too : ")
+
+    create_folder(directory)
+    t = constructTreeLink(baseurl,int(depth))
+    download_All_Update(t,directory,extension)
+    #download_all_in_url(baseurl,directory,extension)
     
 
 #baseurl = "http://www-igm.univ-mlv.fr/~vnozick/teaching/slides/M1_ti/"            
