@@ -87,3 +87,5 @@ ENV/
 
 # Rope project settings
 .ropeproject
+down.py
+test.py
