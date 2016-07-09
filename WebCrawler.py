@@ -27,11 +27,6 @@ Requires BeautifulSoup
     Install :
 		pip install beautifulsoup4
     
-Requires client.textui
-	Install :
-		pip install clint
-
-	
 
 ##################################
 
@@ -46,7 +41,7 @@ Usage:  download_all <url> <folder> <extension>
 """
 
 from bs4 import BeautifulSoup
-from clint.textui import progress
+
 
 import urllib 
 import urllib2
@@ -107,6 +102,7 @@ def download_All_Update(links,folder,extension):
                     f.flush()
             
 # Old version
+# from clint.textui import progress
 def download_one_link(link,baseurl,folder,extension):
     patternFolder = re.compile('.+\.'+extension+'$')
     pattern_filename = re.compile('[^/,]+\.'+extension+'$')
@@ -124,7 +120,6 @@ def download_one_link(link,baseurl,folder,extension):
 ##                if chunk:
 ##                    f.write(chunk)
 ##                    f.flush()
-
         # Version sans la barre            
         r = requests.get(downloadLink, stream=True)
         with open(folder+"/"+name.group(0),"wb") as f:
