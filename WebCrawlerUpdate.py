@@ -25,7 +25,7 @@ How to Install pip:
 
 Requires BeautifulSoup
     Install :
-		pip install beautifulsoup4
+	    pip install beautifulsoup4
 
 """
 
@@ -60,10 +60,8 @@ def constructTreeLink(baseLink,depth):
         print "Too much links in list -> stoping crawling"
         return
     if not has_domain(baseLink):
-        #print "Url : "+baseLink+" not in domain"
         return 
     if baseLink in dictLinks:
-        #print "Link "+baseLink +" already visited"
         if dictLinks[baseLink]:
             return
         else :
