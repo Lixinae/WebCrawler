@@ -47,46 +47,55 @@ dictLinks = {}
 def keepUnique(mylist):
     return list(set(mylist))
 
+#Evite les erreurs de unicode
+FromRaw = lambda r: r if isinstance(r, unicode) else r.decode('utf-8', 'ignore')
+
 
 # Construit la liste des liens telechargeable
 def constructTreeLink(baseLink,depth):
     global dictLinks
-    
     if depth <= 0:
         return
-    if len(dictLinks) > 200:
+    if len(dictLinks) > 1000:
         print "Too much links in list -> stoping crawling"
         return
     if not has_domain(baseLink):
         #print "Url : "+baseLink+" not in domain"
         return 
-    
     if baseLink in dictLinks:
         #print "Link "+baseLink +" already visited"
-        return
-    else :
-        print baseLink
+        if dictLinks[baseLink]:
+            return
+        else :
+            print baseLink
     if not linkCheck(baseLink):
         return
     try :
-        page = urllib2.urlopen(baseLink)
+        page = urllib2.urlopen(baseLink)        
     except Exception,e :
         return
-
-    
-    soup = BeautifulSoup(page.read(),"html.parser")
+    read = page.read()
+    read = FromRaw(read)
+    soup = BeautifulSoup(read,"html.parser")
     links = soup.findAll("a")
     for link in links:
         cleanString = link.get('href','/').replace("%20"," ")
         downloadLink = urlparse.urljoin(baseLink,cleanString)
-        tmp = downloadLink[len(downloadLink)-3:]
-        if not (tmp == "pdf" or tmp == "odp" or tmp == "txt" or tmp == "zip"):
-            constructTreeLink(downloadLink,depth-1)
-        else :
-            if downloadLink not in dictLinks:
-                downloadLink = re.sub(r"[\t\n]","",downloadLink)
-                #print downloadLink
-                dictLinks[downloadLink] = True
+        #tmp = downloadLink[len(downloadLink)-3:]
+        if downloadLink not in dictLinks:
+            downloadLink = re.sub(r"[\t\n]","",downloadLink)
+            #print downloadLink
+            dictLinks[downloadLink] = False
+        constructTreeLink(downloadLink,depth-1)
+        dictLinks[downloadLink] = True
+                
+##        if not (tmp == "pdf" or tmp == "odp" or tmp == "txt" or tmp == "zip"):
+##            constructTreeLink(downloadLink,depth-1)
+##        else :
+##            if downloadLink not in dictLinks:
+##                downloadLink = re.sub(r"[\t\n]","",downloadLink)
+##                #print downloadLink
+##                dictLinks[downloadLink] = True
     return dictLinks
 
 
@@ -169,6 +178,7 @@ def linkCheck(link):
 if __name__ == '__main__':
     while True:
         global domain
+        global dictLinks
         start = False
         while not start:
             baseurl = ""
@@ -205,7 +215,8 @@ if __name__ == '__main__':
         while (end !="y" and end !="n"):
             end = raw_input("Do you wish to restart on another url ? y/n\n")
             if end == "y":
-                break
+                dictLinks = {}
+                break                
                 continue
             elif end == "n":
                 print "Leaving program\n"
