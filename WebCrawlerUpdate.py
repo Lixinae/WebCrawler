@@ -54,7 +54,7 @@ def constructTreeLink(baseLink,depth):
     
     if depth <= 0:
         return
-    if len(dictLinks) > 1000:
+    if len(dictLinks) > 200:
         print "Too much links in list -> stoping crawling"
         return
     if not has_domain(baseLink):
@@ -66,14 +66,14 @@ def constructTreeLink(baseLink,depth):
         return
     else :
         print baseLink
-       
+    if not linkCheck(baseLink):
+        return
     try :
         page = urllib2.urlopen(baseLink)
     except Exception,e :
-        #print "Error "+str(e)
-        #print "Link "+baseLink
         return
-    #print "This is a test"
+
+    
     soup = BeautifulSoup(page.read(),"html.parser")
     links = soup.findAll("a")
     for link in links:
@@ -167,8 +167,7 @@ def linkCheck(link):
 
 
 if __name__ == '__main__':
-    restart = True
-    while restart:
+    while True:
         global domain
         start = False
         while not start:
