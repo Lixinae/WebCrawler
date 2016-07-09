@@ -26,27 +26,12 @@ How to Install pip:
 Requires BeautifulSoup
     Install :
 		pip install beautifulsoup4
-    
-Requires client.textui
-	Install :
-		pip install clint
-
-	
 
 ##################################
 
-
-download_all: downloads all the links with the matching extension to the folder
-
-url : adress of the page you want to download from
-folder : path of the folder where you want to download your stuff
-extension : extension of the files you want
-
-Usage:  download_all <url> <folder> <extension>
 """
 
 from bs4 import BeautifulSoup
-from clint.textui import progress
 
 import urllib 
 import urllib2
@@ -85,12 +70,10 @@ def constructTreeLink(baseLink,depth):
             constructTreeLink(downloadLink,depth-1)
         else :
             #print downloadLink
-            # Test a faire
             treeLinksList.append(str(downloadLink))
     return treeLinksList
 
 # Telecharge tout ce qui match l'extension "extension dans la liste des fichiers
-#
 def download_All_Update(links,folder,extension):
     links = set(links)
     pattern_filename = re.compile('[^/,]+\.'+extension+'$')
@@ -176,7 +159,4 @@ if __name__ == '__main__':
 #folder = "./download/TraitementImage"
 #extension = "pdf"
 #download_all_in_url(baseurl,folder,extension)
-
-
-#strip_folders("base/truc/bidule")
 
