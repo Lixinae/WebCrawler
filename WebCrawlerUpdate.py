@@ -59,6 +59,8 @@ def constructTreeLink(baseLink,depth):
     if len(dictLinks) > 1000:
         print "Too much links in list -> stoping crawling"
         return
+    if not linkCheck(baseLink):
+        return
     if not has_domain(baseLink):
         return 
     if baseLink in dictLinks:
@@ -66,8 +68,6 @@ def constructTreeLink(baseLink,depth):
             return
         else :
             print baseLink
-    if not linkCheck(baseLink):
-        return
     try :
         page = urllib2.urlopen(baseLink)        
     except Exception,e :

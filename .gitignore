@@ -89,3 +89,5 @@ ENV/
 .ropeproject
 down.py
 test.py
+domainTest.py
+WebCrawler_old.py
