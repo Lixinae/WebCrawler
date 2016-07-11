@@ -56,7 +56,7 @@ def constructTreeLink(baseLink,depth):
     global dictLinks
     if depth <= 0:
         return
-    if len(dictLinks) > 1000:
+    if len(dictLinks) > 10000:
         print "Too much links in list -> stoping crawling"
         return
     if not linkCheck(baseLink):
