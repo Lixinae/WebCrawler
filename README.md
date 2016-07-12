@@ -18,10 +18,10 @@ A little webCrawler in Python
 		    * 3 Click on Advanced Tab
 		    * 4 Click on Environment Variables
 		    * 5 From System Variables >>> select variable path.
-		    * 6 Click edit then add the following lines at the end of it
-		     ;c:\Python27;c:\Python27\Scripts
-		    (please dont copy this, just go to your python directory and copy the paths similar to this)
-	    NB:- you have to do this once only.
+		    * 6 Click edit then add the following lines at the end of it :
+		     	* ;c:\Python27;c:\Python27\Scripts
+		    * (please dont copy this, just go to your python directory and copy the paths similar to this)
+	   * NB:- you have to do this once only.
 
 * Install BeautifulSoup :
 	    pip install beautifulsoup4
