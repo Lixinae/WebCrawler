@@ -1,33 +1,5 @@
 # -*- coding: cp1252 -*-
 #!/usr/bin/python
-"""
-(Windows)
-How to Install pip:
-
-    Download https://raw.github.com/pypa/pip/master/contrib/get-pip.py.
-    Remember to save it as "get-pip.py"
-
-    Now go to the download folder. Right click on get-pip.py then open with python.exe.
-
-    You can add system variable by
-    (by doing this you can use pip and easy_install without specifying path)
-
-    1 Clicking on Properties of My Computer
-    2 Then chose Advanced System Settings
-    3 Click on Advanced Tab
-    4 Click on Environment Variables
-    5 From System Variables >>> select variable path.
-    6 Click edit then add the following lines at the end of it
-     ;c:\Python27;c:\Python27\Scripts
-    (please dont copy this, just go to your python directory and copy the paths similar to this)
-    NB:- you have to do this once only.
-
-
-Requires BeautifulSoup
-    Install :
-	    pip install beautifulsoup4
-
-"""
 
 from bs4 import BeautifulSoup
 
@@ -42,58 +14,61 @@ import time
 
 
 dictLinks = {}
+domain = ""
 
 # Retire les doublons d'une liste
 def keepUnique(mylist):
     return list(set(mylist))
 
-#Evite les erreurs de unicode
+# Evite les erreurs de unicode
+# Bug parfois
 FromRaw = lambda r: r if isinstance(r, unicode) else r.decode('utf-8', 'ignore')
 
+def securityCheck(baseLink,depth):
+    global dictLinks
+    if depth <= 0:
+        return False
+    # S'il y a trop de liens dans le dictionnaire
+    if len(dictLinks) > 10000:
+        print "Too much links in list -> stoping crawling"
+        return False
+    # Teste si le lien donné est valide
+    if not linkCheck(baseLink):
+        return False
+    if "?" in baseLink:
+        return False
+    # Test si le domaine du lien est valide
+    if not has_domain(baseLink):
+        return False
+    # Test si le lien est dans le dictionnaire 
+    if baseLink in dictLinks:
+        if dictLinks[baseLink]:
+            return False
+        else :
+            print baseLink
+    return True
 
 # Construit la liste des liens telechargeable
 def constructTreeLink(baseLink,depth):
-    global dictLinks
-    if depth <= 0:
+    if not securityCheck(baseLink,depth):
         return
-    if len(dictLinks) > 10000:
-        print "Too much links in list -> stoping crawling"
-        return
-    if not linkCheck(baseLink):
-        return
-    if not has_domain(baseLink):
-        return 
-    if baseLink in dictLinks:
-        if dictLinks[baseLink]:
-            return
-        else :
-            print baseLink
     try :
         page = urllib2.urlopen(baseLink)        
     except Exception,e :
         return
     read = page.read()
-    read = FromRaw(read)
+    #read = FromRaw(read)
     soup = BeautifulSoup(read,"html.parser")
     links = soup.findAll("a")
+    
     for link in links:
         cleanString = link.get('href','/').replace("%20"," ")
         downloadLink = urlparse.urljoin(baseLink,cleanString)
-        #tmp = downloadLink[len(downloadLink)-3:]
         if downloadLink not in dictLinks:
             downloadLink = re.sub(r"[\t\n]","",downloadLink)
-            #print downloadLink
             dictLinks[downloadLink] = False
         constructTreeLink(downloadLink,depth-1)
         dictLinks[downloadLink] = True
-                
-##        if not (tmp == "pdf" or tmp == "odp" or tmp == "txt" or tmp == "zip"):
-##            constructTreeLink(downloadLink,depth-1)
-##        else :
-##            if downloadLink not in dictLinks:
-##                downloadLink = re.sub(r"[\t\n]","",downloadLink)
-##                #print downloadLink
-##                dictLinks[downloadLink] = True
     return dictLinks
 
 
@@ -118,13 +93,33 @@ def download_All_Update(links,extension):
                     f.flush()
     print "######## Download END   ########## "
 
+#Possible amelioration par rapport a la fonction au dessus
+def download_All_V2(links,extension):
+    links = set(links)
+    pattern_filename = re.compile('(\w+)(\.\w+)+(?!.*(\w+)(\.\w+)+)$')
+    folder = "default"
+    print "######## Download START ########## "
+    for link in links:
+        name = link.split('/').pop()
+        if pattern_filename.search(name):
+            m = re.search("http:\/\/(.*\/)",link)
+            if m:
+                folder = m.group(1)
+            create_folder(folder)                
+            print link
+            r = requests.get(link, stream=True)
+            with open(folder+"/"+name,"wb") as f:
+                for chunk in r:
+                    f.write(chunk)
+                    f.flush()
+    print "######## Download END   ########## "
+
 
 def create_folder(name):
     if not os.path.exists(name):
         print "Creating folder "+name                  
         os.makedirs(name)
 
-domain = ""
 
 # Verify if the given url is in the start domain
 def has_domain(url):
@@ -219,6 +214,3 @@ if __name__ == '__main__':
             elif end == "n":
                 print "Leaving program\n"
                 sys.exit(0)
-    
-
-
