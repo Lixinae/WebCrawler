@@ -32,7 +32,7 @@ def securityCheck(baseLink,depth):
     if len(dictLinks) > 10000:
         print "Too much links in list -> stoping crawling"
         return False
-    # Teste si le lien donné est valide
+    # Teste si le lien donnÃ© est valide
     if not linkCheck(baseLink):
         return False
     if "?" in baseLink:
@@ -94,7 +94,7 @@ def download_All_Update(links,extension):
     print "######## Download END   ########## "
 
 #Possible amelioration par rapport a la fonction au dessus
-def download_All_V2(links,extension):
+def download_All_V2(links):
     links = set(links)
     pattern_filename = re.compile('(\w+)(\.\w+)+(?!.*(\w+)(\.\w+)+)$')
     folder = "default"
