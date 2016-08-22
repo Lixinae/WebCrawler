@@ -22,7 +22,7 @@ def keepUnique(mylist):
 
 # Evite les erreurs de unicode
 # Bug parfois
-FromRaw = lambda r: r if isinstance(r, unicode) else r.decode('utf-8', 'ignore')
+#FromRaw = lambda r: r if isinstance(r, unicode) else r.decode('utf-8', 'ignore')
 
 def securityCheck(baseLink,depth):
     global dictLinks
