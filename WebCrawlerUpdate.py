@@ -13,12 +13,15 @@ import sys
 import time
 
 
-dictLinks = {}
-domain = ""
+
 
 # Evite les erreurs de unicode
 # Bug parfois
 #FromRaw = lambda r: r if isinstance(r, unicode) else r.decode('utf-8', 'ignore')
+
+# Keeps the distinct elements in a list, in the same order as the start
+def keepUniqueOrdered(myList):
+    return [x for i,x in enumerate(myList) if x not in myList[:i]]
 
 # Security checks for the link provided
 def securityCheck(baseLink,depth):
@@ -71,8 +74,7 @@ def constructTreeLink(baseLink,depth):
 
 
 # Downloads only the files with the specific file extensions 
-def download_All_Update(links,extensions):
-    links = set(links)
+def download_All_Specific(links,extensions):
     folder = "default"
     for extension in extensions:    
         pattern_filename = re.compile('[^/,]+\.'+extension+'$')
@@ -92,8 +94,7 @@ def download_All_Update(links,extensions):
 
 
 # Downloads everything in the links provided
-def download_All_V2(links):
-    links = set(links)
+def download_All(links):
     pattern_filename = re.compile('(\w+)(\.\w+)+(?!.*(\w+)(\.\w+)+)$')
     folder = "default"    
     for link in links:
@@ -120,11 +121,7 @@ def create_folder(name):
 
 # Verify if the given url is in the start domain
 def has_domain(url):
-    p = urlparse.urlparse(url)
-    if p.hostname in domain:
-        return True
-    else:
-        return False
+    return urlparse.urlparse(url).hostname in domain
     
 # Tests if the link provided is a correct url
 # Regexp made by @dperini ported by @adamrofer on github
@@ -237,9 +234,11 @@ def askStart():
 
 
 if __name__ == '__main__':
+    global domain
+    global dictLinks
+    dictLinks = {}
+    domain = ""
     while True:
-        global domain
-        global dictLinks
         while True:
             baseurl = askUrl()
             domain = baseurl.split("/")[2]
@@ -252,11 +251,12 @@ if __name__ == '__main__':
         print "######## Crawling START ##########"       
         t = constructTreeLink(baseurl,int(depth))
         print "######## Crawling END   ##########"
+        t = keepUniqueOrdered(list(t))
         print "######## Download START ########## "
         if extensions:
-            download_All_Update(t,extensions)
+            download_All_Specific(t,extensions)
         else :
-            download_All_V2(t);
+            download_All(t);
         print "######## Download END   ########## "
         if askEnd():
             continue
