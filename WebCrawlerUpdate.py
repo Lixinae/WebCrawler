@@ -1,8 +1,8 @@
 # -*- coding: cp1252 -*-
 #!/usr/bin/python
 
-from bs4 import BeautifulSoup
 
+import bs4
 import urllib 
 import urllib2
 import urlparse
@@ -55,7 +55,7 @@ def constructTreeLink(baseLink,depth):
         return
     read = page.read()
     #read = FromRaw(read)
-    soup = BeautifulSoup(read,"html.parser")
+    soup = bs4.BeautifulSoup(read,"html.parser")
     links = soup.findAll("a")
     for link in links:
         cleanString = link.get('href','/').replace("%20"," ")
@@ -234,6 +234,15 @@ def askStart():
 
 
 if __name__ == '__main__':
+    try:
+        import bs4
+        print "BeautifulSoup4 is there, starting program"
+    except ImportError:
+        print "BeautifulSoup4 not installed, please install before using the script"
+        print "Instructions in README file"
+        print "Leaving program"
+        sys.exit(1)
+      
     global domain
     global dictLinks
     dictLinks = {}
