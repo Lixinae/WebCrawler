@@ -4,15 +4,23 @@
 
 import bs4
 import urllib 
-import urllib2
-import urlparse
+#import urllib2
+#import urlparse
 import os
 import re
 import requests
 import sys
 import time
 
+try:
+    import urllib.request as urllib2
+except ImportError:
+    import urllib2
 
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 
 
 # Evite les erreurs de unicode
@@ -31,7 +39,7 @@ def securityCheck(baseLink,depth):
         return False
     # Checks if there is to much links in the dictionnary
     if len(dictLinks) > 10000:
-        print "Too much links in list -> stoping crawling"
+        print ("Too much links in list -> stoping crawling")
         return False
     # Checks if the provided link is correct
     if not linkCheck(baseLink):
@@ -51,7 +59,7 @@ def constructTreeLink(baseLink,depth):
         return
     try :
         page = urllib2.urlopen(baseLink)        
-    except Exception,e :
+    except Exception :
         return
     read = page.read()
     #read = FromRaw(read)
@@ -67,7 +75,7 @@ def constructTreeLink(baseLink,depth):
                 if downloadLink not in dictLinks:
                     downloadLink = re.sub(r"[\t\n]","",downloadLink)
                     dictLinks[downloadLink] = False
-                    print downloadLink
+                    print (downloadLink)
                 constructTreeLink(downloadLink,depth-1)
                 dictLinks[downloadLink] = True
     return dictLinks
@@ -85,7 +93,7 @@ def download_All_Specific(links,extensions):
                 if m:
                     folder = m.group(1)
                 create_folder(folder)                
-                print link
+                print (link)
                 r = requests.get(link, stream=True)
                 with open(folder+"/"+name.group(0),"wb") as f:
                     for chunk in r:
@@ -104,7 +112,7 @@ def download_All(links):
             if m:
                 folder = m.group(1)
             create_folder(folder)                
-            print link
+            print (link)
             r = requests.get(link, stream=True)
             with open(folder+"/"+name,"wb") as f:
                 for chunk in r:
@@ -115,7 +123,7 @@ def download_All(links):
 # If a folder doesn't exist, it's created
 def create_folder(name):
     if not os.path.exists(name):
-        print "Creating folder "+name                  
+        print ("Creating folder "+name)                  
         os.makedirs(name)
 
 
@@ -165,7 +173,7 @@ def linkCheck(link):
 def askUrl():
     baseurl = ""
     while baseurl == "" or not linkCheck(baseurl):
-        baseurl = raw_input("Enter the URL : ")
+        baseurl = input("Enter the URL : ")
         if "http://" not in baseurl and "https://" not in baseurl :
             baseurl = "http://"+baseurl
     return baseurl
@@ -176,22 +184,22 @@ def askSpecific():
     extensions = []
     endAddExt = ""
     while (specificFiles != "y" and specificFiles != "n"):
-        specificFiles = raw_input("Enter :\ny -> if you wish to download files with specific extensions\nn -> download all files in the link\n")
+        specificFiles = input("Enter :\ny -> if you wish to download files with specific extensions\nn -> download all files in the link\n")
         if specificFiles == "y":
             #If he wants specific file extensions, we ask for them
             while True:
-                endAddExt = raw_input("Enter :\nA file extension you want to download(pdf,odp...whatever you want)\n/end -> Stop asking for extensions\n")
+                endAddExt = input("Enter :\nA file extension you want to download(pdf,odp...whatever you want)\n/end -> Stop asking for extensions\n")
                 if endAddExt == "/end":
                    break;
                 else :
                    if len(endAddExt) == 3:
                        extensions.append(endAddExt)
                    else :
-                       print "File extensions must be only 3 caracters\n"
-            print "You asked for these extensions:"
-            print " | ".join(extensions)
+                       print ("File extensions must be only 3 caracters\n")
+            print ("You asked for these extensions:")
+            print (" | ".join(extensions))
             if extensions == []:
-                print "List of extensions empty, switching to non specific mod"
+                print ("List of extensions empty, switching to non specific mod")
             break
         elif specificFiles == "n":
             break
@@ -201,7 +209,7 @@ def askSpecific():
 def askDepth():
     depth = ""
     while True:
-        depth = raw_input("Enter the depth you wish to attain : ")
+        depth = input("Enter the depth you wish to attain : ")
         if not depth.isdigit():
             continue
         if int(depth) > 0:
@@ -212,35 +220,35 @@ def askDepth():
 def askEnd():
     end = ""
     while (end !="y" and end !="n"):
-        end = raw_input("Do you wish to restart on another URL ? y/n\n")
+        end = input("Do you wish to restart on another URL ? y/n\n")
         if end == "y":
             dictLinks = {}
             return True              
         elif end == "n":
-            print "Leaving program\n"
+            print ("Leaving program\n")
             sys.exit(0)
 
 #Asks the user if he wants to start the crawling        
 def askStart():
     wantStart = ""
     while (wantStart !="y" and wantStart !="n" and wantStart !="r"):
-        wantStart = raw_input("Enter :\ny -> Start the crawler\nr -> Restart the program\nn -> Exit the program\n")
+        wantStart = input("Enter :\ny -> Start the crawler\nr -> Restart the program\nn -> Exit the program\n")
         if wantStart == "n":
-            print "Leaving program"
+            print ("Leaving program")
             sys.exit(0)
         elif wantStart == "r":
-            print "Restarting program"
+            print ("Restarting program")
     return wantStart == "y"
 
 
 if __name__ == '__main__':
     try:
         import bs4
-        print "BeautifulSoup4 is there, starting program"
+        print ("BeautifulSoup4 is there, starting program")
     except ImportError:
-        print "BeautifulSoup4 not installed, please install before using the script"
-        print "Instructions in README file"
-        print "Leaving program"
+        print ("BeautifulSoup4 not installed, please install before using the script")
+        print ("Instructions in README file")
+        print ("Leaving program")
         sys.exit(1)
       
     global domain
@@ -257,16 +265,16 @@ if __name__ == '__main__':
                 break
             else :
                 continue
-        print "######## Crawling START ##########"       
+        print ("######## Crawling START ##########" )      
         t = constructTreeLink(baseurl,int(depth))
-        print "######## Crawling END   ##########"
+        print ("######## Crawling END   ##########")
         t = keepUniqueOrdered(list(t))
-        print "######## Download START ########## "
+        print ("######## Download START ########## ")
         if extensions:
             download_All_Specific(t,extensions)
         else :
             download_All(t);
-        print "######## Download END   ########## "
+        print ("######## Download END   ########## ")
         if askEnd():
             continue
         
