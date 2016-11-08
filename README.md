@@ -6,7 +6,7 @@ A little webCrawler in Python
 
 * Install pip (or any package manager): 
     * Installation :
-		*(Windows)
+		* (Windows)
 			* How to Install pip:
 				* Download https://raw.github.com/pypa/pip/master/contrib/get-pip.py.
 				* Remember to save it as "get-pip.py"
@@ -23,7 +23,7 @@ A little webCrawler in Python
 					* (please dont copy this, just go to your python directory and copy the paths similar to this)
 			   * NB:- you have to do this once only.
 		   
-		*(Linux)
+		* (Linux)
 			* Instructions are here https://pip.pypa.io/en/stable/installing/
 			* Below is a shorter version for a quick install
 			* Download : https://bootstrap.pypa.io/get-pip.py (or the previous link)
@@ -31,9 +31,9 @@ A little webCrawler in Python
 			
 		
 	* Upgrading:
-		*(Windows)
+		* (Windows)
 			* python -m pip install -U pip
-		*(Linux)
+		* (Linux)
 			* pip install -U pip
 		
 	
