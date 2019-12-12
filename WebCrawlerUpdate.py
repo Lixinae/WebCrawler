@@ -4,8 +4,6 @@
 
 import bs4
 import urllib 
-#import urllib2
-#import urlparse
 import os
 import re
 import requests
@@ -32,8 +30,7 @@ def keepUniqueOrdered(myList):
     return [x for i,x in enumerate(myList) if x not in myList[:i]]
 
 # Security checks for the link provided
-def securityCheck(baseLink,depth):
-    global dictLinks
+def securityCheck(baseLink,depth,dictLinks,domain):
     # Checks the depth we are at
     if depth <= 0:
         return False
@@ -45,7 +42,7 @@ def securityCheck(baseLink,depth):
     if not linkCheck(baseLink):
         return False
     # Checks if the link is in the base domain
-    if not has_domain(baseLink):
+    if not has_domain(baseLink,domain):
         return False
     # Checks if the link is already in the dictionnary and if has been visited
     if baseLink in dictLinks:
@@ -54,8 +51,8 @@ def securityCheck(baseLink,depth):
     return True
 
 # Constructs the links dictionnary
-def constructTreeLink(baseLink,depth):
-    if not securityCheck(baseLink,depth):
+def constructTreeLink(baseLink,depth,dictLinks,domain):
+    if not securityCheck(baseLink,depth,dictLinks,domain):
         return
     try :
         page = urllib2.urlopen(baseLink)        
@@ -80,6 +77,35 @@ def constructTreeLink(baseLink,depth):
                 dictLinks[downloadLink] = True
     return dictLinks
 
+# Constructs the links dictionnary
+def constructTreeLinkNoRecursive(baseLink,depth,dictLinks,domain):
+	
+
+
+    if not securityCheck(baseLink,depth,dictLinks,domain):
+        return
+    try :
+        page = urllib2.urlopen(baseLink)        
+    except Exception :
+        return
+    read = page.read()
+    #read = FromRaw(read)
+    soup = bs4.BeautifulSoup(read,"html.parser")
+    links = soup.findAll("a")
+    for link in links:
+        cleanString = link.get('href','/').replace("%20"," ")
+        downloadLink = urlparse.urljoin(baseLink,cleanString)
+        # Checks if we do not go back in the website
+        if not len(downloadLink) < len(baseLink):
+            # Avoid strange links
+            if not "?" in downloadLink:
+                if downloadLink not in dictLinks:
+                    downloadLink = re.sub(r"[\t\n]","",downloadLink)
+                    dictLinks[downloadLink] = False
+                    print (downloadLink)
+                constructTreeLink(downloadLink,depth-1)
+                dictLinks[downloadLink] = True
+    return dictLinks
 
 # Downloads only the files with the specific file extensions 
 def download_All_Specific(links,extensions):
@@ -128,7 +154,7 @@ def create_folder(name):
 
 
 # Verify if the given url is in the start domain
-def has_domain(url):
+def has_domain(url,domain):
     return urlparse.urlparse(url).hostname in domain
     
 # Tests if the link provided is a correct url
@@ -217,7 +243,7 @@ def askDepth():
     return int(depth)
 
 #Asks the user if he wants to restart on another url or stop the program
-def askEnd():
+def askEnd(dictLinks):
     end = ""
     while (end !="y" and end !="n"):
         end = input("Do you wish to restart on another URL ? y/n\n")
@@ -250,9 +276,7 @@ if __name__ == '__main__':
         print ("Instructions in README file")
         print ("Leaving program")
         sys.exit(1)
-      
-    global domain
-    global dictLinks
+
     dictLinks = {}
     domain = ""
     while True:
@@ -266,7 +290,7 @@ if __name__ == '__main__':
             else :
                 continue
         print ("######## Crawling START ##########" )      
-        t = constructTreeLink(baseurl,int(depth))
+        t = constructTreeLink(baseurl,int(depth),dictLinks,domain)
         print ("######## Crawling END   ##########")
         t = keepUniqueOrdered(list(t))
         print ("######## Download START ########## ")
@@ -275,6 +299,6 @@ if __name__ == '__main__':
         else :
             download_All(t);
         print ("######## Download END   ########## ")
-        if askEnd():
+        if askEnd(dictLinks):
             continue
         
