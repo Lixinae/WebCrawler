@@ -42,7 +42,7 @@ def securityCheck(baseLink,depth,dictLinks,domain):
     if not linkCheck(baseLink):
         return False
     # Checks if the link is in the base domain
-    if not has_domain(baseLink,domain):
+    if not hasDomain(baseLink,domain):
         return False
     # Checks if the link is already in the dictionnary and if has been visited
     if baseLink in dictLinks:
@@ -73,7 +73,7 @@ def constructTreeLink(baseLink,depth,dictLinks,domain):
                     downloadLink = re.sub(r"[\t\n]","",downloadLink)
                     dictLinks[downloadLink] = False
                     print (downloadLink)
-                constructTreeLink(downloadLink,depth-1)
+                constructTreeLink(downloadLink,depth-1,dictLinks,domain)
                 dictLinks[downloadLink] = True
     return dictLinks
 
@@ -85,17 +85,17 @@ def constructTreeLinkNoRecursive(baseLink,depth,dictLinks,domain):
     #return dictLinks
 
 # Downloads only the files with the specific file extensions 
-def download_All_Specific(links,extensions):
+def downloadAllSpecific(links,extensions):
     folder = "default"
     for extension in extensions:    
-        pattern_filename = re.compile('[^/,]+\.'+extension+'$')
+        patternFilename = re.compile('[^/,]+\.'+extension+'$')
         for link in links:
-            name = pattern_filename.search(link)
+            name = patternFilename.search(link)
             if name:
                 m = re.search("http:\/\/(.*\/)",link)
                 if m:
                     folder = m.group(1)
-                create_folder(folder)                
+                createFolder(folder)                
                 print (link)
                 r = requests.get(link, stream=True)
                 with open(folder+"/"+name.group(0),"wb") as f:
@@ -105,16 +105,16 @@ def download_All_Specific(links,extensions):
 
 
 # Downloads everything in the links provided
-def download_All(links):
-    pattern_filename = re.compile('(\w+)(\.\w+)+(?!.*(\w+)(\.\w+)+)$')
+def downloadAll(links):
+    patternFilename = re.compile('(\w+)(\.\w+)+(?!.*(\w+)(\.\w+)+)$')
     folder = "default"    
     for link in links:
         name = link.split('/').pop()
-        if pattern_filename.search(name):
+        if patternFilename.search(name):
             m = re.search("http:\/\/(.*\/)",link)
             if m:
                 folder = m.group(1)
-            create_folder(folder)                
+            createFolder(folder)                
             print (link)
             r = requests.get(link, stream=True)
             with open(folder+"/"+name,"wb") as f:
@@ -124,14 +124,14 @@ def download_All(links):
 
 
 # If a folder doesn't exist, it's created
-def create_folder(name):
+def createFolder(name):
     if not os.path.exists(name):
         print ("Creating folder "+name)                  
         os.makedirs(name)
 
 
 # Verify if the given url is in the start domain
-def has_domain(url,domain):
+def hasDomain(url,domain):
     return urlparse.urlparse(url).hostname in domain
     
 # Tests if the link provided is a correct url
@@ -272,9 +272,9 @@ if __name__ == '__main__':
         t = keepUniqueOrdered(list(t))
         print ("######## Download START ########## ")
         if extensions:
-            download_All_Specific(t,extensions)
+            downloadAllSpecific(t,extensions)
         else :
-            download_All(t);
+            downloadAll(t);
         print ("######## Download END   ########## ")
         if askEnd(dictLinks):
             continue
