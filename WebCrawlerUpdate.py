@@ -79,33 +79,10 @@ def constructTreeLink(baseLink,depth,dictLinks,domain):
 
 # Constructs the links dictionnary
 def constructTreeLinkNoRecursive(baseLink,depth,dictLinks,domain):
-	
+	pass
+	# Todo -> Find a way to make it iterative
 
-
-    if not securityCheck(baseLink,depth,dictLinks,domain):
-        return
-    try :
-        page = urllib2.urlopen(baseLink)        
-    except Exception :
-        return
-    read = page.read()
-    #read = FromRaw(read)
-    soup = bs4.BeautifulSoup(read,"html.parser")
-    links = soup.findAll("a")
-    for link in links:
-        cleanString = link.get('href','/').replace("%20"," ")
-        downloadLink = urlparse.urljoin(baseLink,cleanString)
-        # Checks if we do not go back in the website
-        if not len(downloadLink) < len(baseLink):
-            # Avoid strange links
-            if not "?" in downloadLink:
-                if downloadLink not in dictLinks:
-                    downloadLink = re.sub(r"[\t\n]","",downloadLink)
-                    dictLinks[downloadLink] = False
-                    print (downloadLink)
-                constructTreeLink(downloadLink,depth-1)
-                dictLinks[downloadLink] = True
-    return dictLinks
+    #return dictLinks
 
 # Downloads only the files with the specific file extensions 
 def download_All_Specific(links,extensions):
