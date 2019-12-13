@@ -44,5 +44,8 @@ A little webCrawler in Python
 
 * Just launch the python script and follow the instructions.
 
-* If you find any bug thanks to report it :)
+* /!\ This script doesn't work if you need to log in the website to download elements /!\
+* /!\ It's only supports direct links in the website /!\
+
+* If you find any bugs thanks to report them :)
 
