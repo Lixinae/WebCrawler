@@ -47,6 +47,6 @@ A little webCrawler in Python
 * /!\ This script doesn't work if you need to log in the website to download elements /!\
 * /!\ It's only supports direct links in the website /!\
 
-* If you find any bugs thanks to report them :)
+* If you find any bugs feel free to tell me about them :)
 
 You can try it on repl.it : [![Run on Repl.it](https://repl.it/badge/github/Vahen/WebCrawler)](https://repl.it/github/Vahen/WebCrawler)
