@@ -71,7 +71,7 @@ def constructTreeLink(baseLink,depth,dictLinks,domain) -> Dict[str,bool]:
         cleanString = linkA.get('href','/').replace("%20"," ")
         downloadLink = urlparse.urljoin(baseLink,cleanString)
         # Checks if we do not go back in the website
-        if not len(downloadLink) < len(linkA):
+        if not len(downloadLink) < len(baseLink):
             # Avoid strange links
             if not "?" in downloadLink:
                 if downloadLink not in dictLinks:
