@@ -122,7 +122,7 @@ def downloadAllSpecific(links,extensions):
 # Downloads everything in the links provided
 def downloadAll(links):
     patternFilename = re.compile('(\w+)(\.\w+)+(?!.*(\w+)(\.\w+)+)$')
-    folder = "default"    
+    folder = "default"
     for link in links:
         name = link.split('/').pop()
         # Todo -> Factoriser le code, code dupliqué ligne 109
@@ -130,7 +130,7 @@ def downloadAll(links):
             m = re.search("http:\/\/(.*\/)",link)
             if m:
                 folder = m.group(1)
-            createFolder(folder)                
+            createFolder(folder)
             print (link)
             r = requests.get(link, stream=True)
             with open(folder+"/"+name,"wb") as f:
@@ -237,7 +237,7 @@ def askEnd() -> bool:
     while (end !="y" and end !="n"):
         end = input("Do you wish to restart on another URL ? y/n\n")
         if end == "y":
-            return True              
+            return True
         elif end == "n":
             return False
 
@@ -268,7 +268,7 @@ if __name__ == '__main__':
                 break
             else :
                 continue
-        print ("######## Crawling START ##########" )      
+        print ("######## Crawling START ##########" )
         dictLinksList = constructTreeLink(baseurl,int(depth),dictLinks,domain)
         print ("######## Crawling END   ##########")
         dictLinksList = keepUniqueOrdered(list(dictLinksList))
@@ -282,5 +282,4 @@ if __name__ == '__main__':
             dictLinks = {}
         else:
             print ("Leaving program\n")
-            sys.exit(0)    
-        
+            sys.exit(0)
