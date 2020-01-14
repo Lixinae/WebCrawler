@@ -1,15 +1,23 @@
 # -*- coding: cp1252 -*-
 #!/usr/bin/python
 
-
-import bs4
+import sys
 import os
 import re
 import requests
-import sys
+
+try:
+    import bs4
+    print ("BeautifulSoup4 is there, starting program")
+except ImportError:
+    print ("BeautifulSoup4 not installed, please install before using the script")
+    print ("Instructions in README file")
+    print ("Leaving program")
+    sys.exit(1)
 
 from typing import Dict, List
 
+# Compatibility between python 2 and 3
 try:
     import urllib.request as urllib2
 except ImportError:
@@ -55,7 +63,7 @@ def constructTreeLink(baseLink,depth,dictLinks,domain) -> Dict[str,bool]:
     if not securityCheck(baseLink,depth,dictLinks,domain):
         return
     try :
-        page = urllib2.urlopen(baseLink)        
+        page = urllib2.urlopen(baseLink)
     except Exception :
 	    print("Could not open link :" + baseLink)
 	    return
@@ -73,7 +81,7 @@ def constructTreeLink(baseLink,depth,dictLinks,domain) -> Dict[str,bool]:
         # Checks if we do not go back in the website
         if not len(downloadLink) < len(baseLink):
             # Avoid strange links
-            if not "?" in downloadLink:
+            if "?" not in downloadLink:
                 if downloadLink not in dictLinks:
                     downloadLink = re.sub(r"[\t\n]","",downloadLink)
                     # Add the link to the dictionnary, indicating it's not yet visited
@@ -91,18 +99,19 @@ def constructTreeLinkNoRecursive(baseLink,depth,dictLinks,domain):
 
     #return dictLinks
 
-# Downloads only the files with the specific file extensions 
+# Downloads only the files with the specific file extensions
 def downloadAllSpecific(links,extensions):
     folder = "default"
-    for extension in extensions:    
+    for extension in extensions:
         patternFilename = re.compile('[^/,]+\.'+extension+'$')
         for link in links:
+            # Todo -> Factoriser le code, code dupliqué ligne 129
             name = patternFilename.search(link)
             if name:
                 m = re.search("http:\/\/(.*\/)",link)
                 if m:
                     folder = m.group(1)
-                createFolder(folder)                
+                createFolder(folder)
                 print (link)
                 r = requests.get(link, stream=True)
                 with open(folder+"/"+name.group(0),"wb") as f:
@@ -116,6 +125,7 @@ def downloadAll(links):
     folder = "default"    
     for link in links:
         name = link.split('/').pop()
+        # Todo -> Factoriser le code, code dupliqué ligne 109
         if patternFilename.search(name):
             m = re.search("http:\/\/(.*\/)",link)
             if m:
@@ -131,7 +141,7 @@ def downloadAll(links):
 # If a folder doesn't exist, it's created
 def createFolder(name):
     if not os.path.exists(name):
-        print ("Creating folder "+name)                  
+        print ("Creating folder "+name)
         os.makedirs(name)
 
 # Verify if the given url is in the start domain
@@ -185,7 +195,7 @@ def askUrl() -> str:
             baseurl = "http://"+baseurl
     return baseurl
 
-#Asks the user if he wants files with specific extensions or everything  
+#Asks the user if he wants files with specific extensions or everything
 def askSpecific() -> List[str]:
     specificFiles = ""
     extensions = []
@@ -212,7 +222,7 @@ def askSpecific() -> List[str]:
             break
     return extensions
 
-#Asks the user for the maximum depth he wants to crawl too 
+#Asks the user for the maximum depth he wants to crawl too
 def askDepth() -> int:
     depth = ""
     while not depth.isdigit():
@@ -231,7 +241,7 @@ def askEnd() -> bool:
         elif end == "n":
             return False
 
-#Asks the user if he wants to start the crawling        
+#Asks the user if he wants to start the crawling
 def askStart() -> bool:
     wantStart = ""
     while (wantStart !="y" and wantStart !="n" and wantStart !="r"):
@@ -245,14 +255,6 @@ def askStart() -> bool:
 
 # Main of the program
 if __name__ == '__main__':
-    try:
-        import bs4
-        print ("BeautifulSoup4 is there, starting program")
-    except ImportError:
-        print ("BeautifulSoup4 not installed, please install before using the script")
-        print ("Instructions in README file")
-        print ("Leaving program")
-        sys.exit(1)
 
     dictLinks = {}
     domain = ""
