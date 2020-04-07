@@ -1,8 +1,9 @@
+
+
+# Important /!\ : This project is now integrated within the VahenWebsite project (https://github.com/Vahen/VahenWebsite) as a submodule of the project. The developpement will be on the website rather than here
+
 # WebCrawler
 A little webCrawler in Python, using Beautifoul Soup 4
-
-* Important /!\ : This project is now integrated within the VahenWebsite project (https://github.com/Vahen/VahenWebsite) as a submodule of the project.
-
 
 ## How to install
 
